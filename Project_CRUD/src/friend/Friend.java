@@ -11,16 +11,40 @@ public class Friend {
 	public static User login;
 	public static Scanner scan = new Scanner(System.in);
 	
-	public static void printFriend() throws SQLException {
+	public void printFriend() throws SQLException {
 		List<String> friends = friend.readFriends();
-		System.out.println(friends);
+		int count=1;
+		System.out.println("\n"+User.id+"님의 친구 목록 입니다.");
+		for(String friend:friends) {
+			System.out.println(count+"."+friend);
+			count++;
+		}
+		System.out.println();
 	}
 	
-	public static void addFriend() throws SQLException {
+	/* 친구추가 */
+	public void addFriend() throws SQLException {
 		System.out.print("추가할 친구 아이디: ");
 		String friendId = scan.nextLine();
 		System.out.print("추가할 친구 이름: ");
 		String friendName = scan.nextLine();
-		friend.createFriends(friendName, friendId,login.id);
+		friend.addFriend(friendName, friendId,login.id);
+	}
+	
+	/* 친구삭제 */
+	public void delete() {
+		try {
+			String id;
+			System.out.print("삭제 할 친구 아이디:");
+			id = scan.next();
+			
+			int result = friend.deleteData(id);
+			if(result!=0)
+				System.out.println("성공적으로 삭제하였습니다.\n");
+			else
+				System.out.println("삭제 실패했습니다.");
+		} catch (Exception e) {
+			System.out.println(e.toString());
+		}
 	}
 }

@@ -42,5 +42,12 @@ public class UserDTO {
 		this.regdate = regdate;
 	}
 	
+	@Override
+	public String toString() {
+		String str = String.format("아이디:%s \n이름:%s \n",
+				userId, userName);
 
+		return str;
+
+	}
 }

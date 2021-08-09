@@ -9,16 +9,18 @@ public class UserDAO {
 	
 	public UserDAO() {
 	}
-	
-	public int loginPermission(String userID, String userPassword) { // 어떤 계정에 대한 실제로 로그인을 시도하는 함수, 인자값으로 ID와 Password를 받아 login을 판단함.
+	/* 어떤 계정에 대한 실제로 로그인을 시도하는 함수, 인자값으로 ID와 Password를 받아 login을 판단함.*/
+	public int loginCheck(String userID, String userPassword) {
 		Connection conn=Connect.connect();
 		PreparedStatement pstmt=Connect.pstmt;
 		ResultSet rs=Connect.rs;
-		String SQL = "SELECT userPassword FROM user WHERE userID = ?"; // 실제로 DB에 입력될 명령어를 SQL 문장으로 만듬.
+		// 실제로 DB에 입력될 명령어를 SQL 문장으로 만듦
+		String SQL = "SELECT userPassword FROM user WHERE userID = ?";
 		try {
 			pstmt = conn.prepareStatement(SQL);
 			pstmt.setString(1,  userID);
-			rs = pstmt.executeQuery(); // 어떠한 결과를 받아오는 ResultSet 타입의 rs 변수에 쿼리문을 실행한 결과를 넣어줌 
+			// 결과를 받아오는 ResultSet 타입의 rs 변수에 쿼리문을 실행한 결과를 넣어줌
+			rs = pstmt.executeQuery(); 
 			if (rs.next()) {
 				if (rs.getString(1).contentEquals(userPassword)) {
 					rs.close();
@@ -79,6 +81,119 @@ public class UserDAO {
 		}
 		return lists;
 
+	}
+	
+	public int insertData(UserDTO dto){
+
+		int result = 0;
+
+		Connection conn = Connect.connect();
+		PreparedStatement pstmt = null;
+		String sql;
+
+		try {
+
+			sql = "insert into user(userId,userPassword,userName)";
+			sql+= "values (?,?,?)";
+
+			pstmt = conn.prepareStatement(sql);
+
+			pstmt.setString(1, dto.getUserId());
+			pstmt.setString(2, dto.getUserPassword());
+			pstmt.setString(3, dto.getUserName());	
+
+			result = pstmt.executeUpdate();
+			pstmt.close();
+			conn.close();
+
+		} catch (Exception e) {
+
+			System.out.println(e.toString());
+
+		}
+
+		return result;
+	}
+	
+	/* selectAll */
+	public List<UserDTO> getList() {
+		List<UserDTO> lists = new ArrayList<UserDTO>();
+		Connection conn = Connect.connect();
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String sql;
+
+		try {
+	
+			sql = "select userId,userPassword,userName"
+					+"from user";
+			pstmt = conn.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+	
+			while(rs.next()){
+				UserDTO dto = new UserDTO();
+
+				dto.setUserId(rs.getString("userId"));
+				dto.setUserPassword(rs.getString("userPassword"));
+				dto.setUserName(rs.getString("userName"));
+
+				lists.add(dto);
+			}
+	
+			rs.close();
+			pstmt.close();
+			conn.close();
+	
+		} catch (Exception e) {
+			System.out.println(e.toString());
+		}
+		return lists;
+	}
+	
+	/* update */
+	public int updateData(UserDTO dto){
+		int result = 0;
+		Connection conn = Connect.connect();
+		PreparedStatement pstmt = null;
+		String sql;
+		try {
+			//password 변경
+			sql = "update user set userPassword=?"
+					+ "where userId=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, dto.getUserPassword());
+			pstmt.setString(2, dto.getUserId());
+			result = pstmt.executeUpdate();
+
+			pstmt.close();
+			conn.close();
+		} catch (Exception e) {
+			System.out.println(e.toString());
+		}
+		return result;
+	}
+	
+	/* delete */
+
+	public int deleteData(String id, String pw){
+		int result = 0;
+		Connection conn = Connect.connect();
+		PreparedStatement pstmt = null;
+		String sql;
+		
+		try {
+			sql = "delete from user where userId=? and userPassword=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, id);
+			pstmt.setString(2, pw);
+			result = pstmt.executeUpdate();
+			pstmt.close();
+			conn.close();
+
+		} catch (Exception e) {
+			System.out.println(e.toString());
+		}
+		return result;	
 	}
 
 }
