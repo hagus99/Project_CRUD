@@ -1,6 +1,8 @@
 package user;
 
 import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -22,6 +24,7 @@ public class LoginFrame extends JFrame implements ActionListener {
     JButton loginButton = new JButton("LOGIN");
     JButton joinButton = new JButton("JOIN");
     JCheckBox showPassword = new JCheckBox("Show Password");
+    private Dimension frameSize, screenSize;
     public String userText;
     public String pwdText;
     
@@ -38,6 +41,14 @@ public class LoginFrame extends JFrame implements ActionListener {
  
     public void setLayoutManager() {
         container.setLayout(null);
+    }
+    
+ // 화면 중앙에 Frame 위치
+    public void screenSizeLocation() {
+    frameSize = getSize(); // 컴포넌트 크기
+    screenSize = Toolkit.getDefaultToolkit().getScreenSize(); // 모니터 화면의 크기 구하기
+    // (모니터화면 가로 - 프레임화면 가로) / 2, (모니터화면 세로 - 프레임화면 세로) / 2
+    setLocation((screenSize.width - frameSize.width)/2, (screenSize.height - frameSize.height)/2);
     }
  
     public void setLocationAndSize() {
@@ -75,12 +86,15 @@ public class LoginFrame extends JFrame implements ActionListener {
             pwdText = passwordField.getText();
             login = userDAO.loginCheck(userText,pwdText);
             if (login==1) {
-                result=JOptionPane.showConfirmDialog(this, "WELCOME "+userText,"OK",
-                		JOptionPane.OK_CANCEL_OPTION);
-                if(result==JOptionPane.OK_OPTION) {
-                	result=1;
-                	setVisible(false);
-                }
+                //result=JOptionPane.showMessageDialog(this, "WELCOME "+userText);
+//                if(result==JOptionPane.OK_OPTION) {
+//                	result=1;
+//                	setVisible(false);
+//                }
+            	JOptionPane.showMessageDialog(this, "WELCOME "+userText);
+            	User.id=userText;
+            	new MenuFrame();
+            	setVisible(false);
             } else if(login==0){
                 JOptionPane.showMessageDialog(this, "Invalid Password");
                 result=0;

@@ -20,6 +20,7 @@ public class User{
         frame.setTitle("Login");
         frame.setVisible(true);
         frame.setBounds(10,10,370,600);
+        frame.screenSizeLocation();
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
         

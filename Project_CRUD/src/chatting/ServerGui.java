@@ -13,7 +13,7 @@ public class ServerGui extends JFrame implements ActionListener {
     private static final long serialVersionUID = 1L;
     private JTextArea jta = new JTextArea(40, 25);
     private JTextField jtf = new JTextField(25);
-    private Server server = new Server();
+    private Server_ori server = new Server_ori();
  
     public ServerGui() throws IOException {
  

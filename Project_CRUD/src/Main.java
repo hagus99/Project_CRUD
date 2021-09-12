@@ -11,6 +11,7 @@ import javax.swing.JProgressBar;
 
 import chatting.Client;
 import chatting.ClientGui;
+import chatting.MainChat;
 import chatting.Room;
 import chatting.TestClient;
 import database.Connect;
@@ -58,7 +59,16 @@ public class Main{
 			}
 			else if(menu==2) {
 				//채팅방 입장
-		        new ClientGui();
+				System.out.println("1. 새로운 방 만들기 2. 기존 방 입장");
+				menu=scan.nextInt();
+				if(menu==1) {
+					 
+				}
+					
+				else if(menu==2)
+//					new ClientGui();
+					new MainChat();
+			
 			}
 			
 			else if(menu==3) {

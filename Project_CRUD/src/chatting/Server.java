@@ -1,109 +1,81 @@
 package chatting;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+
 import java.io.IOException;
+
 import java.net.ServerSocket;
+
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
- 
-public class Server {
-    private ServerSocket serverSocket;
-    private Socket socket;
-    
-    //GUi연동시키면서 서버Gui에 메시지띄움.
-    //private ServerGui gui;
-    private String msg;
- 
-    /* 사용자들의 정보를 저장하는 맵. */
-    private Map<String, DataOutputStream> clientsMap = new HashMap<String, DataOutputStream>();
-    //private List<String> roomList = new ArrayList<String>();
- 
-    /*
-    public final void setGui(ServerGui gui) {
-        this.gui = gui;
-    }
-    */
- 
-    public void setting() throws IOException {
-        Collections.synchronizedMap(clientsMap); // 이걸 교통정리 해줍니다^^
-        serverSocket = new ServerSocket(7777);
-        
-        while (true) {
-            /** XXX 01. 첫번째. 서버가 할일 분담. 계속 접속받는것. */
-            System.out.println("서버 대기중...");
-          
-            socket = serverSocket.accept(); // 먼저 서버가 할일은 계속 반복해서 사용자를 받는다.
+
+import java.util.Vector;
 
 
-            System.out.println(socket.getInetAddress() + "에서 접속했습니다.");
 
-            // 여기서 새로운 사용자 쓰레드 클래스 생성해서 소켓정보를 넣어줘야겠죠?!
-            Receiver receiver = new Receiver(socket);       
-            receiver.start();
+public class Server implements Runnable{
+    //Server클래스: 소켓을 통한 접속서비스, 접속클라이언트 관리
+	Vector<Service> allV;//모든 사용자(대기실사용자 + 대화방사용자)
 
-        }
-    }
- 
-    public static void main(String[] args) throws IOException {
-        Server serverBackground = new Server();
-        serverBackground.setting();
-    }
- 
-    // 맵의내용(클라이언트) 저장과 삭제
-    public void addClient(String nick, DataOutputStream out) throws IOException {
-        sendMessage(nick + "님이 접속하셨습니다.\n");
-        clientsMap.put(nick, out);
-    }
- 
-    public void removeClient(String nick) {
-        sendMessage(nick + "님이 나가셨습니다.\n");
-        clientsMap.remove(nick);
-    }
- 
-    // 메시지 내용 전파
-    public void sendMessage(String msg) {
-        Iterator<String> it = clientsMap.keySet().iterator();
-        String key = "";
-        while (it.hasNext()) {
-            key = it.next();
-            try {
-                clientsMap.get(key).writeUTF(msg);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
- 
-    // -----------------------------------------------------------------------------
-    class Receiver extends Thread {
-        private DataInputStream in;
-        private DataOutputStream out;
-        private String nick;
- 
-        /** XXX 2. 리시버가 한일은 자기 혼자서 네트워크 처리 계속..듣기.. 처리해주는 것. */
-        public Receiver(Socket socket) throws IOException {
-            out = new DataOutputStream(socket.getOutputStream());
-            in = new DataInputStream(socket.getInputStream());
-            nick = in.readUTF();
-            addClient(nick, out);
-        }
- 
-        public void run() {
-            try {// 계속 듣기만!!
-                while (in != null) {
-                    msg = in.readUTF();
-                    sendMessage(msg);
-                    //gui.appendMsg(msg);
-                }
-            } catch (IOException e) {
-                // 사용접속종료시 여기서 에러 발생. 그럼나간거에요.. 여기서 리무브 클라이언트 처리 해줍니다.
-                removeClient(nick);
-            }
-        }
-    }
+	Vector<Service> waitV;//대기실 사용자	   
+
+	Vector<Room> roomV;//개설된 대화방 Room-vs(Vector) : 대화방사용자
+
+	public Server() {
+
+		allV = new Vector<>();
+
+		waitV = new Vector<>();
+
+		roomV = new Vector<>();
+
+		
+
+	   //Thread t = new Thread(run메소드의 위치);  t.start();
+
+		new Thread(this).start();
+
+	}//생성자
+
+	
+	@Override
+	public void run(){
+
+	   try {
+
+		ServerSocket ss = new ServerSocket(5000);
+
+		     //현재 실행중인 ip + 명시된 port ----> 소켓서비스   
+
+		   System.out.println("Start Server.......");
+
+		   while(true){
+
+			   Socket s = ss.accept();//클라이언트 접속 대기	
+
+			   //s: 접속한 클라이언트의 소켓정보
+
+			   Service ser = new Service(s, this);
+
+			   //allV.add(ser);//전체사용자에 등록
+
+			   //waitV.add(ser);//대기실사용자에 등록
+
+		   }
+
+		   
+
+	   } catch (IOException e) {
+
+		e.printStackTrace();
+
+	  }	   
+
+	}//run	
+
+	
+
+   public static void main(String[] args) {
+
+	   new Server();
+
+   }
+
 }

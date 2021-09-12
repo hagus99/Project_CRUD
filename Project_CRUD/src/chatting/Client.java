@@ -23,7 +23,7 @@ public class Client {
  
     public void connet() {
         try {
-            socket = new Socket("192.168.0.30", 7777);
+            socket = new Socket("172.17.179.39", 7777);
             System.out.println("서버 연결됨.");
 
  
